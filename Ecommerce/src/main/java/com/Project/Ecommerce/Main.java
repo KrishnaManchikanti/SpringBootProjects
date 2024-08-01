@@ -1,42 +1,65 @@
 package com.Project.Ecommerce;
 
-
 import com.Project.Ecommerce.Entity.*;
 import com.Project.Ecommerce.Service.EmailNotificationService;
 import com.Project.Ecommerce.Service.NotificationService;
 import com.Project.Ecommerce.Service.SMSService;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        Product product1 = new Product(1, "Laptop", 1000, 10);
-        Product product2 = new Product(2, "Mouse", 50, 100);
+        System.out.println("welcome to Shopping Cart");
+        Scanner s = new Scanner(System.in);
 
-        Customer customer = new Customer(1, "John Doe", "john.doe@example.com", new ArrayList<Order>());
+        System.out.println("Please enter your name & email");
+        String customerName = s.next();
+        String customerEmail = s.next();
+        Customer customer1 = new Customer(customerName, customerEmail);
 
-        Order order = new Order(1, customer.getId(),new ArrayList<Product>(), 200, OrderStatus.PENDING);
-        order.addProduct(product1);
-        order.addProduct(product2);
-//Customer placing an order
-        customer.placeOrder(order);
-//Updating product stock.
-        product1.reduceStock(1);
-        product2.increaseStock(2);
-//Calculating the total amount of the order.
-        System.out.println("Order Total Amount: " + order.getTotalAmount());
+        Order order = new Order(customer1.getId());
+        System.out.println(customer1.getName() + " :Do you like to order \n Select 1 to order, Select 2 exist");
+        int start = s.nextInt();
+        boolean shopping = true;
+        if (start == 1) {
+            while (shopping) {
+                System.out.println("please enter product name");
+                String productName = s.next();
+                System.out.println("please enter quantity to place order");
+                int numProducts = s.nextInt();
+                order.addProduct(new Product(productName), numProducts);
+                System.out.println("Do you want to add another product \n Select 1 if yes, Select 2 done");
 
-        System.out.println("Product1 Stock: " + product1.getStockQuantity());
-        System.out.println("Product2 Stock: " + product2.getStockQuantity());
+                start = s.nextInt();
+                if (start == 2)
+                    shopping = false;
+            }
+            System.out.println("totalAmount: " + Order.totalAmount);
+            customer1.placeOrder(order);
 
-//Notifying the customer.
-        NotificationService emailService = new EmailNotificationService();
-        emailService.notify(customer, "Your order has been placed.");
+            NotificationService emailService = new EmailNotificationService();
+            emailService.notify(customer1, "Your order has been placed.");
+            NotificationService smsService = new SMSService();
+            smsService.notify(customer1, "Your order has been placed.");
 
-        NotificationService smsService = new SMSService();
-        smsService.notify(customer, "Your order has been placed.");
+            customer1.getAllOrders();
+            customer1.displayInfo();
+           Customer.getOrdersByCustomerId(customer1.getId());
+           System.out.println(customer1.getOrderById(order.getId()));
+
+            //modify & cancel order
+            order.removeProduct(order.getProductList().get(0).getProduct(), 1);
+            customer1.cancelOrder(order);
+
+            customer1.getAllOrders();
+            customer1.displayInfo();
+        }
     }
 }
+
+
+
+
+

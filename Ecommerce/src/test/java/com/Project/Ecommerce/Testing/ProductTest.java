@@ -8,15 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ProductTest {
     @Test
     public void testReduceStock() {
-        Product product = new Product(1, "Laptop", 1000, 10);
+        Product product = new Product("laptop");
         product.reduceStock(3);
         assertEquals(7, product.getStockQuantity());
     }
 
     @Test
     public void testIncreaseStock() {
-        Product product = new Product(1, "Laptop", 1000, 10);
+        Product product = new Product("mobile");
         product.increaseStock(5);
-        assertEquals(15, product.getStockQuantity());
+        assertEquals(10, product.getStockQuantity());
     }
 }

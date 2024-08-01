@@ -1,40 +1,107 @@
 package com.Project.Ecommerce.Entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.Project.Ecommerce.Repository.OrderRepository;
+import com.Project.Ecommerce.Repository.OrderRepositoryImpl;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+/**
+ * Represents a customer in the e-commerce system.
+ * <p>
+ * This class is responsible for managing customer-related operations such as placing and canceling orders.
+ * </p>
+ *
+ * @implNote This class uses the `NameAndId` superclass to inherit common properties for customer identification.
+ */
+@Getter
+@Setter
+public class Customer extends NameAndId {
 
-public class Customer {
-    int id;
-    String name;
-    String email;
-    List<Order> orderList;
+    private String email;
+    private List<Order> orderList = new ArrayList<>();
+
+    static OrderRepository orderRepository = new OrderRepositoryImpl();
+    RandomNumberGenerator randomNumberGenerator = new RandomNumberGenerator();
 
     public Customer(String name, String email) {
-        this.name = name;
+        this.setName(name);
         this.email = email;
+        this.setId(randomNumberGenerator.getRandomValue());
     }
 
-    // Methods to manage orders
+    /**
+     * @param order as input then order will be placed and update the order status
+     */
     public void placeOrder(Order order) {
-        if (order == null) {
+        if (order == null || order.getProductList().isEmpty() || order.getCustomerId() == 0) {
             throw new IllegalArgumentException("Order cannot be null.");
         }
-        orderList.add(order);
+
+        order.setOrderStatus(OrderStatus.SHIPPED);
+        orderRepository.addOrder(order);
+        order.setOrderStatus(OrderStatus.DELIVERED);
+
     }
 
+    /**
+     * @param order as input then cancel the order and update the order status
+     */
     public void cancelOrder(Order order) {
         if (order == null) {
             throw new IllegalArgumentException("Order cannot be null.");
         }
-        if (!orderList.remove(order)) {
-            throw new IllegalArgumentException("Order not found in the list.");
+        order.setOrderStatus(OrderStatus.CANCELLED);
+        orderRepository.removeOrder(order);
+        System.out.println("order canceled successfully");
+    }
+
+    /**
+     * @param id check id is present in order
+     * @return an order if found
+     */
+    public Order getOrderById(int id) {
+        return orderRepository.getOrderById(id);
+    }
+
+    /**
+     * @param customerId check id is present in order & Print the order
+     */
+    public static void getOrdersByCustomerId(int customerId) {
+        List<Order> orders = orderRepository.getOrdersByCustomerId(customerId);
+        printOrder(orders);
+    }
+
+    /**
+     * printOrder is helperMethod takes @param orders as input
+     */
+    private static void printOrder(List<Order> orders) {
+        for (Order order : orders) {
+            System.out.print("CustomerId: " + order.getCustomerId() + "getOrderStatus: " + order.getOrderStatus());
+            System.out.println();
+            List<ItemQuantity> productList = order.getProductList();
+            for (ItemQuantity item : productList) {
+                System.out.println("ordered product " + item.getProduct().getName() + " is " + item.getProduct().getProductStatus() + " with price " + item.getProduct().getPrice());
+            }
+            System.out.println();
         }
+    }
+
+    /**
+     * will print listOfOrders
+     */
+    public void getAllOrders() {
+        List<Order> orders = orderRepository.getAllOrders();
+        printOrder(orders);
+    }
+
+    /**
+     * print customerDetails
+     */
+    @Override
+    public void displayInfo() {
+        System.out.println("name: " + getName() + " id: " + getId());
     }
 }
