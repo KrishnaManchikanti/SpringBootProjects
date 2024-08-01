@@ -10,6 +10,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class ItemQuantity {
-    Product product;
-    int numProducts;
+    private Product product;
+    private int numProducts;
 }

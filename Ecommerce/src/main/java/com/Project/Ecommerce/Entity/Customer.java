@@ -23,8 +23,8 @@ public class Customer extends NameAndId {
     private String email;
     private List<Order> orderList = new ArrayList<>();
 
-    static OrderRepository orderRepository = new OrderRepositoryImpl();
-    RandomNumberGenerator randomNumberGenerator = new RandomNumberGenerator();
+    private final OrderRepository orderRepository = new OrderRepositoryImpl();
+    private final RandomNumberGenerator randomNumberGenerator = new RandomNumberGenerator();
 
     public Customer(String name, String email) {
         this.setName(name);
@@ -69,7 +69,7 @@ public class Customer extends NameAndId {
     /**
      * @param customerId check id is present in order & Print the order
      */
-    public static void getOrdersByCustomerId(int customerId) {
+    public void getOrdersByCustomerId(int customerId) {
         List<Order> orders = orderRepository.getOrdersByCustomerId(customerId);
         printOrder(orders);
     }
@@ -78,6 +78,10 @@ public class Customer extends NameAndId {
      * printOrder is helperMethod takes @param orders as input
      */
     private static void printOrder(List<Order> orders) {
+        if (orders.isEmpty()) {
+            System.out.println("Your orderList is Empty: Start Shopping:)");
+            return;
+        }
         for (Order order : orders) {
             System.out.print("CustomerId: " + order.getCustomerId() + "getOrderStatus: " + order.getOrderStatus());
             System.out.println();

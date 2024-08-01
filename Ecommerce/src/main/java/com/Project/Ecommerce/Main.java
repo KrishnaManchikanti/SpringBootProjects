@@ -36,7 +36,7 @@ public class Main {
                 if (start == 2)
                     shopping = false;
             }
-            System.out.println("totalAmount: " + Order.totalAmount);
+            System.out.println("totalAmount: " + Order.getFinalAmount());
             customer1.placeOrder(order);
 
             NotificationService emailService = new EmailNotificationService();
@@ -46,8 +46,8 @@ public class Main {
 
             customer1.getAllOrders();
             customer1.displayInfo();
-           Customer.getOrdersByCustomerId(customer1.getId());
-           System.out.println(customer1.getOrderById(order.getId()));
+            customer1.getOrdersByCustomerId(customer1.getId());
+            System.out.println(customer1.getOrderById(order.getId()));
 
             //modify & cancel order
             order.removeProduct(order.getProductList().get(0).getProduct(), 1);
