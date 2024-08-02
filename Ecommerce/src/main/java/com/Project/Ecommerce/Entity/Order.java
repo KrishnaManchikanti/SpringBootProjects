@@ -20,10 +20,10 @@ public class Order {
     private int id;
     private int customerId;
     private List<ItemQuantity> productList = new ArrayList<>();
-    public static double totalAmount;
+    private static double totalAmount;
     private OrderStatus orderStatus;
 
-    private static RandomNumberGenerator randomNumberGenerator = new RandomNumberGenerator();
+    private final RandomNumberGenerator randomNumberGenerator = new RandomNumberGenerator();
 
     /**
      * Constructs an Order for a specific customer.
@@ -114,5 +114,9 @@ public class Order {
     private void calculateTotalAmount(double price) {
         totalAmount += price;
         System.out.println("Total amount: " + totalAmount);
+    }
+
+    public static double getFinalAmount(){
+        return totalAmount;
     }
 }
