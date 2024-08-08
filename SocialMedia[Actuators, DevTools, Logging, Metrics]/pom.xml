@@ -17,7 +17,13 @@
 		<java.version>17</java.version>
 	</properties>
 	<dependencies>
-		
+		<!-- https://mvnrepository.com/artifact/io.micrometer/micrometer-registry-prometheus -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -47,7 +53,6 @@
 			<version>1.18.30</version>
 			<scope>provided</scope>
 		</dependency>
-
 
 		<dependency>
 			<groupId>com.mysql</groupId>

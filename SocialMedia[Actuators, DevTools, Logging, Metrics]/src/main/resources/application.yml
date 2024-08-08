@@ -15,6 +15,20 @@ management:
     info:
         env:
             enabled: true
+
+logging:
+    level:
+        #        root: DEBUG, changing root level of logging
+        com:
+            example:
+                socialMedia: TRACE #changing root level of our application
+    #Saving the logs
+    file:
+        name: logger.log
+    #Customizing the logs how to be saved
+    pattern:
+        file: '%d{yyyy-mm-dd} [%level] %c{1.} [%t] %m%n'
+
 server:
     port: 8081
 spring:
@@ -26,3 +40,7 @@ spring:
     jpa:
         hibernate.ddl-auto: update
         show-sql: true
+#Color Coding
+    output:
+        ansi:
+            enabled: always
