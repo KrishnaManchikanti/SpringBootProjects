@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
@@ -18,4 +19,9 @@ public class Author extends BaseEntity {
     @JsonIgnore
     private List<Book> bookList;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    long id;
+    @Size(min = 3, max = 15)
+    String name;
 }

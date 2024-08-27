@@ -18,5 +18,8 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Query("SELECT b FROM Book b JOIN b.loan l WHERE l.status = 'OVERDUE' OR l.status = 'BORROWED'")
     List<Book> findAllByLoanDifferentStatus();
 
+    @Query("SELECT b FROM Book b JOIN b.loan l WHERE l.status = 'OVERDUE' OR l.status = 'BORROWED' OR l.status = 'RETURNED'")
+    List<Book> GetOrderHistory();
+
     List<Book> getAllBooksByAuthorId(long id);
 }

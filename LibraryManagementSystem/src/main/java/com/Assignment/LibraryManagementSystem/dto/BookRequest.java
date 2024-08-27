@@ -15,7 +15,5 @@ import lombok.NoArgsConstructor;
 public class BookRequest {
     private String title;
     private Author author;
-    private Loan loan;
-    private User user;
     private long price;
 }

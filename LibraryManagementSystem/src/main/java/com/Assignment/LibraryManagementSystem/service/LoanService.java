@@ -93,7 +93,7 @@ public class LoanService {
      */
     public void returnBook(long userId, long bookId, double payingAmount) {
         if (payingAmount != amountToBePaid(userId, bookId)) {
-            log.info("DueAmount {} and payingAmount {} are not same", amountToBePaid(userId, bookId), payingAmount);
+            log.error("DueAmount {} and payingAmount {} are not same", amountToBePaid(userId, bookId), payingAmount);
             throw new PayableAmountMismatch("DueAmount and payingAmount are not same");
         }
 
@@ -101,13 +101,13 @@ public class LoanService {
         Book book = findBookById(bookId);
 
         if (!book.getUser().equals(user)) {
-            log.warn("User with ID {} is not the current borrower of book with ID {}", userId, bookId);
+            log.error("User with ID {} is not the current borrower of book with ID {}", userId, bookId);
             throw new UserMismatch("User with ID " + userId + " is not the current borrower of the book.");
         }
 
         book.setUser(null);
         if (!user.getBookList().remove(book)) {
-            log.warn("Book with ID {} not found in the book list of user with ID {}", bookId, userId);
+            log.error("Book with ID {} not found in the book list of user with ID {}", bookId, userId);
             throw new BookNotFoundException("Book with ID {} not found in the book list of user with ID {}");
         }
         log.info("Book with ID {} is removed from book list of user with ID {}", bookId, userId);
@@ -119,6 +119,7 @@ public class LoanService {
         loan.setEndDate(LocalDate.now());
 
         Loan newLoan = Loan.builder().status(Status.AVAILABLE).bookId(-1).userId(-1).build();
+        newLoan.setBookId(bookId);
         book.setLoan(newLoan);
 
         loanRepository.save(loan);
@@ -168,14 +169,6 @@ public class LoanService {
     }
 
     /**
-     * Retrieves all borrowed books.
-     */
-    public List<Book> getAllBorrowBooks() {
-        log.info("Fetched all borrowed books");
-        return bookRepository.findAllByLoanDifferentStatus();
-    }
-
-    /**
      * Retrieves all overdue loans and updates their status.
      */
     public List<Book> overdueLoans() {
@@ -195,7 +188,7 @@ public class LoanService {
     /**
      * Updates the status of loans for overdue books.
      */
-    private void updateLoanStatus() {
+    void updateLoanStatus() {
         List<Book> bookList = bookRepository.findAll();
         bookList = bookList.stream().filter(book -> book.getLoan() != null)
                 .filter(book -> book.getLoan().getEndDate() != null)

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,7 +26,7 @@ public class UserService {
         User user = User.builder()
                 .phNo(userRequest.getPhNo())
                 .address(userRequest.getAddress())
-                .bookList(userRequest.getBookList())
+                .bookList(new ArrayList<>())
                 .build();
 
         user.setName(userRequest.getName());
@@ -66,9 +67,6 @@ public class UserService {
 
         if (userRequest.getPhNo() != null)
             user.setPhNo(userRequest.getPhNo());
-
-        if (userRequest.getBookList() != null)
-            user.setBookList(userRequest.getBookList());
 
         userRepository.save(user);
         log.info("Updated user with ID {}", userId);

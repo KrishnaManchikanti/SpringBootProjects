@@ -10,6 +10,7 @@ import com.Assignment.LibraryManagementSystem.entity.Author;
 import com.Assignment.LibraryManagementSystem.entity.Book;
 import com.Assignment.LibraryManagementSystem.exceptions.AuthorDeletionException;
 import com.Assignment.LibraryManagementSystem.exceptions.AuthorNotFoundException;
+import com.Assignment.LibraryManagementSystem.exceptions.InvalidInputException;
 import com.Assignment.LibraryManagementSystem.repository.AuthorRepository;
 import com.Assignment.LibraryManagementSystem.repository.BookRepository;
 import org.junit.jupiter.api.Assertions;
@@ -51,10 +52,9 @@ public class AuthorServiceTest {
 
         AuthorRequest authorRequest = new AuthorRequest();
         authorRequest.setName("John Doe");
-        authorRequest.setBookList(Arrays.asList(new Book(), new Book()));
 
         Mockito.when(authorRepository.save(Mockito.any(Author.class)))
-                .thenReturn(new Author(authorRequest.getBookList()));
+                .thenReturn(new Author());
 
         authorService.addAuthor(authorRequest);
         verify(authorRepository).save(any(Author.class));
@@ -139,10 +139,10 @@ public class AuthorServiceTest {
     public void testUpdateAuthor(){
         AuthorRequest authorRequest = new AuthorRequest();
         authorRequest.setName("John Doe");
-        authorRequest.setBookList(Arrays.asList(new Book(), new Book()));
 
         long id =1;
-        Author expectedAuthor = new Author(authorRequest.getBookList());
+        Author expectedAuthor = new Author();
+        expectedAuthor.setName(authorRequest.getName());
         when(authorRepository.findById(id)).thenReturn(Optional.of(expectedAuthor));
 
         authorRepository.save(expectedAuthor);
@@ -154,16 +154,17 @@ public class AuthorServiceTest {
     @DisplayName("UpdateAuthorFailure")
     public void testUpdateAuthorFailure(){
         AuthorRequest authorRequest = new AuthorRequest();
-        authorRequest.setBookList(Arrays.asList(new Book(), new Book()));
         System.out.println(authorRequest.getName());
         long id =1;
 
-        Author expectedAuthor = new Author(authorRequest.getBookList());
+        Author expectedAuthor = new Author();
+
         when(authorRepository.findById(id)).thenReturn(Optional.of(expectedAuthor));
 
-        authorService.updateAuthor(authorRequest, id);
+        InvalidInputException exception = assertThrows(InvalidInputException.class, ()->
+                authorService.updateAuthor(authorRequest, id));
 
-        verify(authorRepository, never()).save(any(Author.class));
+        assertEquals(exception.getClass(),InvalidInputException.class);
     }
 
     @Test

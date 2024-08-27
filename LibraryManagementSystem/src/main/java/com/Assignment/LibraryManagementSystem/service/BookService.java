@@ -3,6 +3,7 @@ package com.Assignment.LibraryManagementSystem.service;
 import com.Assignment.LibraryManagementSystem.dto.BookRequest;
 import com.Assignment.LibraryManagementSystem.entity.Author;
 import com.Assignment.LibraryManagementSystem.entity.Book;
+import com.Assignment.LibraryManagementSystem.entity.Loan;
 import com.Assignment.LibraryManagementSystem.entity.Status;
 import com.Assignment.LibraryManagementSystem.exceptions.BookDeletionException;
 import com.Assignment.LibraryManagementSystem.exceptions.BookNotFoundException;
@@ -21,6 +22,7 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
+    private final LoanService loanService;
 
     /**
      * Adds a new book, creating or updating the associated author.
@@ -38,8 +40,8 @@ public class BookService {
         }
 
         Book newBook = Book.builder()
-                .user(book.getUser())
-                .loan(book.getLoan())
+                .user(null)
+                .loan(new Loan(Status.AVAILABLE))
                 .price(book.getPrice())
                 .title(book.getTitle())
                 .author(author)
@@ -60,9 +62,15 @@ public class BookService {
     /**
      * Retrieves a list of all available books.
      */
-    public List<Book> getAllAvailableBooks() {
-        log.info("Fetched all available books");
-        return bookRepository.findAllByLoanStatus(Status.AVAILABLE);
+    public List<Book> getAllBooksByStatus(String loanStatus) {
+        log.info("Fetching Books Started");
+        loanService.updateLoanStatus();
+        if (loanStatus.equalsIgnoreCase("borrowed")){
+            log.info("Fetched all {}: books",loanStatus);
+            return bookRepository.findAllByLoanDifferentStatus();
+        }
+        log.info("Fetched all {}: books",loanStatus);
+        return bookRepository.findAllByLoanStatus(Status.valueOf(loanStatus.toUpperCase()));
     }
 
     /**
@@ -113,16 +121,14 @@ public class BookService {
         if (bookRequest.getTitle() != null)
             existingBook.setTitle(bookRequest.getTitle());
 
-        if (bookRequest.getUser() != null)
-            existingBook.setUser(bookRequest.getUser());
-
-        if (bookRequest.getLoan() != null)
-            existingBook.setLoan(bookRequest.getLoan());
-
         if (bookRequest.getAuthor() != null)
             existingBook.setAuthor(bookRequest.getAuthor());
 
-        bookRepository.save(existingBook);
+        bookRepository.save(existingBook);//try-catch
         log.info("Updated book with ID: {} with new data", id);
+    }
+
+    public List<Book> getOrderHistory() {
+        return bookRepository.GetOrderHistory();
     }
 }

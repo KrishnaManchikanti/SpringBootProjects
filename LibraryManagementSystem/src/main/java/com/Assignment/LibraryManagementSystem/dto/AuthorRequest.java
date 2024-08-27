@@ -14,6 +14,4 @@ import java.util.List;
 @Builder
 public class AuthorRequest {
     private String name;
-    private List<Book> bookList;
-
 }

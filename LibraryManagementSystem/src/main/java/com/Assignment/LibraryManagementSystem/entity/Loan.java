@@ -14,7 +14,6 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class Loan {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
@@ -28,5 +27,9 @@ public class Loan {
     @OneToMany(mappedBy = "loan")
     @JsonIgnore
     private List<Book> bookList;
+
+    public Loan(Status status) {
+        this.status = status;
+    }
 
 }

@@ -17,6 +17,4 @@ public class UserRequest {
     private String name;
     private String phNo;
     private String address;
-    private Loan loan;
-    private List<Book> bookList;
 }
