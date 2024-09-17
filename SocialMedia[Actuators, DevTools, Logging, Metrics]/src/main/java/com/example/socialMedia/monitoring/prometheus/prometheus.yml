@@ -1,0 +1,25 @@
+# my global config
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+
+# Scrape_timeout is set to the global default (10s).
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+# - "first_rules.yml"
+# - "second_rules.yml"
+
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any time series scraped from this config.
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9090'] # Use localhost since it's from the perspective of Prometheus container
+
+  - job_name: 'my-spring-actuator'
+    metrics_path: '/admin/prometheus' # where metrics should be fetched
+    scrape_interval: 2s
+    static_configs:
+      - targets: ['192.168.1.2:8081']
+        labels:
+          application: "Ninjas Social Media Application"
