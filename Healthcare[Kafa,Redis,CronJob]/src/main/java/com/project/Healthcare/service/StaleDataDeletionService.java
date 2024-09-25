@@ -1,6 +1,6 @@
 package com.project.Healthcare.service;
 
-import com.project.Healthcare.model.MedicalData;
+import com.project.Healthcare.model.Consultation;
 import com.project.Healthcare.repository.MedicalDataRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +21,20 @@ public class StaleDataDeletionService {
     public void deleteStaleData() {
         // Define the threshold date (e.g., data older than 30 days is considered stale)
         LocalDateTime thresholdDate = LocalDateTime.now().minusDays(30);
-        List<Long> staleDataIds = medicalDataRepository.findByCreatedAtBefore(thresholdDate).stream()
-                .map(MedicalData::getId).toList();
+        log.info("Identifying stale records older than {}", thresholdDate);
 
-        // Delete stale data
-        medicalDataRepository.deleteAllById(staleDataIds);
+        // Find stale data
+        List<Consultation> staleData = medicalDataRepository.findByCreatedAtBefore(thresholdDate);
+        List<Long> staleDataIds = staleData.stream()
+                .map(Consultation::getId)
+                .toList();
 
-        // Log the number of records deleted
-        log.info("Deleted {} stale records older than {}", staleDataIds.size(), thresholdDate);
+        // If there are stale records, delete them
+        if (!staleDataIds.isEmpty()) {
+            medicalDataRepository.deleteAllById(staleDataIds);
+            log.info("Deleted {} stale records older than {}", staleDataIds.size(), thresholdDate);
+        } else {
+            log.info("No stale records found older than {}", thresholdDate);
+        }
     }
 }

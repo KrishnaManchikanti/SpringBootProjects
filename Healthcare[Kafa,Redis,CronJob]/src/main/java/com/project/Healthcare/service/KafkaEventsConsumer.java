@@ -1,11 +1,9 @@
 package com.project.Healthcare.service;
 
-import com.project.Healthcare.model.MedicalData;
-import com.project.Healthcare.repository.MedicalDataRepository;
+import com.project.Healthcare.model.Patient;
+import com.project.Healthcare.repository.PatientRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -13,32 +11,23 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class KafkaEventsConsumer {
 
-    @Autowired
-    LargePayloadService largePayloadService;
+    private final PatientRepository patientRepository;
 
     @Autowired
-    MedicalDataRepository medicalDataRepository;
-
-    @KafkaListener(topics = "customTopic", groupId = "jt-custom-group")
-
-    public void consumeEvents(MedicalData medicalData) {
-        log.info("Consumer consumed the events {}", medicalData);
-
-        MedicalData entity = new MedicalData(
-                medicalData.getPatientId(),
-                medicalData.getDoctorId(),
-                medicalData.getDiagnosis(),
-                medicalData.getCreatedAt()
-        );
-
-        log.info("Processing...LargePayload");
-        largePayloadService.processLargePayload(entity);
+    public KafkaEventsConsumer(PatientRepository patientRepository) {
+        this.patientRepository = patientRepository;
     }
 
-    @Cacheable(value = "medicalDataCache", key = "#id")
-    public MedicalData getMedicalData(Long id) {
-        log.info("id {}", id);
-        return medicalDataRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("MedicalData not found with id: " + id));
+    @KafkaListener(topics = "${app.topic.name}", groupId = "patient-data")
+    public void consumePatientData(Patient patient) {
+        log.info("Received patient data: {}", patient);
+
+        try {
+            // Save patient data to the repository
+            patientRepository.save(patient);
+            log.info("Successfully saved patient data: {}", patient.getId());
+        } catch (Exception e) {
+            log.error("Failed to save patient data: {}", patient, e);
+        }
     }
 }

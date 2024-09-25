@@ -14,16 +14,16 @@ public class StaleDataDeletionJob {
     private final StaleDataDeletionService staleDataDeletionService;
 
     // Run the job at midnight daily
-//    @Scheduled(cron = "0 0 0 * * ?")
-    @Scheduled(cron = "0 * * * * ?")  // Runs every minute
+    // Uncomment the line below to schedule it for daily execution
+    // @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 * * * * ?")  // Runs every minute for testing purposes
     public void run() {
         log.info("Starting scheduled task to delete stale data...");
         try {
             staleDataDeletionService.deleteStaleData();
-            log.info("Scheduled task completed.");
+            log.info("Scheduled task completed successfully.");
         } catch (Exception e) {
             log.error("Error during scheduled stale data deletion", e);
         }
     }
 }
-

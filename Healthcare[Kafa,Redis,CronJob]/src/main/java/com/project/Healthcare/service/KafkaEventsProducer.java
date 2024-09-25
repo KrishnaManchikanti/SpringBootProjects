@@ -1,7 +1,9 @@
 package com.project.Healthcare.service;
 
-import com.project.Healthcare.model.MedicalData;
+import com.project.Healthcare.model.Patient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
@@ -9,39 +11,29 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.CompletableFuture;
 
 @Service
+@Slf4j
 public class KafkaEventsProducer {
 
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+
+    @Value("${app.topic.name}")
+    private String topicName;
+
     @Autowired
-    private KafkaTemplate<MedicalData, Object> kafkaTemplate;
-
-    public void sendEventsToTopic(MedicalData medicalData) {
-
-        try {
-            CompletableFuture<SendResult<MedicalData, Object>> future = kafkaTemplate.send("customTopic", medicalData);
-            future.whenComplete((result, ex) -> {
-                if (ex == null) {
-                    System.out.println("Sent message=[" + medicalData.toString() + "] with offset=[" + result.getRecordMetadata().offset() + "]");
-                } else {
-                    System.out.println("Unable to send message=[" +
-                            medicalData.toString() + "] due to : " + ex.getMessage());
-                }
-            });
-        } catch (Exception e) {
-            System.out.println("error" + e.getMessage());
-        }
+    public KafkaEventsProducer(KafkaTemplate<String, Object> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void sendMessageToTopic(String message){
-        CompletableFuture<SendResult<MedicalData, Object>> future = kafkaTemplate.send("javatechie-demo2", message);
-        future.whenComplete((result,ex)->{
+    public void sendPatientToTopic(Patient patient) {
+        log.info("Preparing to send patient data to Kafka topic: {}", topicName);
+
+        CompletableFuture<SendResult<String, Object>> completableFuture = kafkaTemplate.send(topicName, patient);
+        completableFuture.whenComplete((result, ex) -> {
             if (ex == null) {
-                System.out.println("Sent message=[" + message +
-                        "] with offset=[" + result.getRecordMetadata().offset() + "]");
+                log.info("Sent message=[{}] with offset=[{}]", patient, result.getRecordMetadata().offset());
             } else {
-                System.out.println("Unable to send message=[" +
-                        message + "] due to : " + ex.getMessage());
+                log.error("Unable to send message=[{}] due to: {}", patient, ex.getMessage(), ex);
             }
         });
-
     }
 }

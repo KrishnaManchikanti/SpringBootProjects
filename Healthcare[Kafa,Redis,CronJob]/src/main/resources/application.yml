@@ -5,7 +5,7 @@ spring:
   cache:
     type: redis
   datasource:
-    url: jdbc:mysql://localhost:3306/medicaldb
+    url: jdbc:mysql://localhost:3306/medical_db
     username: root
     password: 12345678
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -28,6 +28,8 @@ spring:
 #      bootstrap-servers: localhost:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-
+app:
+  topic:
+    name: newPatientTopic1
 server:
   port: 9292

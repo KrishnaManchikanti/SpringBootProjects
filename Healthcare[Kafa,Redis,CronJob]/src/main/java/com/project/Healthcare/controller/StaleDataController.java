@@ -21,11 +21,11 @@ public class StaleDataController {
         log.info("Manual trigger to delete stale data initiated...");
         try {
             staleDataDeletionService.deleteStaleData();
+            log.info("Stale data deletion executed successfully.");
             return "Stale data deletion executed successfully!";
         } catch (Exception e) {
             log.error("Error during manual stale data deletion", e);
-            return "Error during stale data deletion!";
+            return "Error during stale data deletion: " + e.getMessage();
         }
     }
 }
-

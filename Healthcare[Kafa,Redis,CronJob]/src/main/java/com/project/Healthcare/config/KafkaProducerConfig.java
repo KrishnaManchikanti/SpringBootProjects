@@ -1,24 +1,28 @@
 package com.project.Healthcare.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.ProducerFactory;
-import org.springframework.kafka.support.serializer.JsonSerializer;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Configuration
 public class KafkaProducerConfig {
+
+    @Value("${app.topic.name}")
+    private String topicName;
+
+    /**
+     * Creates a new Kafka topic with the specified name,
+     * partitions, and replication factor.
+     *
+     * @return a NewTopic instance configured with the topic name,
+     *         three partitions, and a replication factor of 1.
+     */
     @Bean
     public NewTopic createTopic() {
-        return new NewTopic("customTopic", 3, (short) 1);
+        return new NewTopic(topicName, 3, (short) 1);
     }
+}
 
 //
 //    @Bean
@@ -43,4 +47,3 @@ public class KafkaProducerConfig {
 //        return new KafkaTemplate<>(producerFactory());
 //    }
 
-}
