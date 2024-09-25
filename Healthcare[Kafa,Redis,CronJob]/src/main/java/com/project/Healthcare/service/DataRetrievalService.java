@@ -1,5 +1,6 @@
 package com.project.Healthcare.service;
 
+import com.project.Healthcare.exception.PatientNotFound;
 import com.project.Healthcare.model.Patient;
 import com.project.Healthcare.repository.PatientRepository;
 import org.hibernate.Hibernate;
@@ -9,6 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -24,10 +29,10 @@ public class DataRetrievalService {
 
     // Cache the result of this method. Cache key is automatically the method name
     @Cacheable(value = "patients")
-    public List<Patient> getAllPatient() {
-        log.info("Fetching all patients from the database.");
-        List<Patient> patients = patientRepository.findAll();
-        log.info("Retrieved {} patients.", patients.size());
+    public Page<Patient> getAllPatient(Pageable pageable, Specification<Patient> spec) {
+        log.info("Fetching all patients from the database with paging and filtering.");
+        Page<Patient> patients = patientRepository.findAll(spec, pageable);
+        log.info("Retrieved {} patients.", patients.getTotalElements());
         return patients;
     }
 
@@ -38,7 +43,7 @@ public class DataRetrievalService {
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Patient not found with ID: {}", id);
-                    return new EntityNotFoundException("Patient not found");
+                    return new PatientNotFound("Patient not found");
                 });
         Hibernate.initialize(patient.getMedications());
         log.info("Successfully retrieved patient: {}", patient);
@@ -61,4 +66,9 @@ public class DataRetrievalService {
         patientRepository.deleteById(id);
         log.info("Patient with ID: {} has been deleted.", id);
     }
+
+    public List<Patient> getPatientByInsuranceProvider(String insuranceProvider) {
+        return patientRepository.getPatientByInsuranceProvider(insuranceProvider);
+    }
+
 }

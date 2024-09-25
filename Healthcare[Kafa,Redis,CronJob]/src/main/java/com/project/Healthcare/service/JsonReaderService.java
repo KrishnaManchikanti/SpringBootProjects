@@ -3,6 +3,7 @@ package com.project.Healthcare.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.project.Healthcare.exception.ErrorReadingJsonException;
 import com.project.Healthcare.model.Consultation;
 import com.project.Healthcare.model.Insurance;
 import com.project.Healthcare.model.Medication;
@@ -69,7 +70,7 @@ public class JsonReaderService {
 
         } catch (Exception e) {
             log.error("Failed to parse JSON data: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to parse JSON", e);
+            throw new ErrorReadingJsonException("Failed to parse JSON " +e);
         }
 
         long endTime = System.currentTimeMillis();

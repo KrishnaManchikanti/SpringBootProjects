@@ -3,6 +3,7 @@ package com.project.Healthcare.service;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
+import com.project.Healthcare.exception.ErrorReadingCsvException;
 import com.project.Healthcare.model.Patient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
@@ -37,7 +38,7 @@ public class CsvReaderService {
 
         } catch (IOException e) {
             log.error("Error reading the CSV file: {}", csvFile.getFilename(), e);
-            throw new RuntimeException("Failed to read CSV file: " + csvFile.getFilename(), e);
+            throw new ErrorReadingCsvException("Failed to read CSV file: " + csvFile.getFilename()+" "+ e);
         } finally {
             log.info("Finished reading CSV file: {}", csvFile.getFilename());
         }

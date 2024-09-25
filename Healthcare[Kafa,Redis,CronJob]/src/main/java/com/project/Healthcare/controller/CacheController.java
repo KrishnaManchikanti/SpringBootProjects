@@ -5,6 +5,10 @@ import com.project.Healthcare.service.DataRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,15 +29,40 @@ public class CacheController {
         this.cacheManager = cacheManager;
     }
 
-    // Endpoint to retrieve all patients (with caching)
     @GetMapping("/patients")
-    public ResponseEntity<List<Patient>> getAllPatients() {
+    public ResponseEntity<Page<Patient>> getAllPatients(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Integer age) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Specification<Patient> spec = filterByAge(age);
         log.info("Retrieving all patients from cache or database.");
-        List<Patient> patients = dataRetrievalService.getAllPatient();
+        Page<Patient> patients = dataRetrievalService.getAllPatient(pageable, spec);
         return ResponseEntity.ok(patients);
     }
 
-    // Endpoint to retrieve a specific patient by ID (with caching)
+    // Filtering by age
+    private Specification<Patient> filterByAge(Integer age) {
+        return (root, query, builder) -> {
+            if (age != null) {
+                return builder.equal(root.get("age"), age);
+            }
+            return builder.conjunction();
+        };
+    }
+
+    /**
+     *
+     * @param insuranceProvider as PathVariable
+     * @return Patient by Insurance Provider using NativeQuery
+     */
+    @GetMapping("/provider/{insuranceProvider}")
+    public ResponseEntity<List<Patient>> getPatientByInsuranceProvider(@PathVariable String insuranceProvider) {
+        List<Patient> patients = dataRetrievalService.getPatientByInsuranceProvider(insuranceProvider);
+        return ResponseEntity.ok(patients);
+    }
+
     @GetMapping("/patient/{id}")
     public ResponseEntity<Patient> getPatientById(@PathVariable Long id) {
         log.info("Retrieving patient with ID: {}", id);
@@ -41,7 +70,6 @@ public class CacheController {
         return ResponseEntity.ok(patient);
     }
 
-    // Endpoint to update a patient in the cache (force a cache update)
     @PutMapping("/patient/{id}")
     public ResponseEntity<Patient> updatePatientCache(@PathVariable Long id, @RequestBody Patient patient) {
         log.info("Updating patient with ID: {}", id);
@@ -49,7 +77,7 @@ public class CacheController {
         return ResponseEntity.ok(updatedPatient);
     }
 
-    // Endpoint to clear a specific patient cache entry
+
     @DeleteMapping("/patient/{id}/evict")
     public ResponseEntity<String> evictPatientCache(@PathVariable Long id) {
         log.info("Evicting patient cache for ID: {}", id);
@@ -57,7 +85,7 @@ public class CacheController {
         return ResponseEntity.ok("Patient cache evicted for ID: " + id);
     }
 
-    // Endpoint to clear all patient caches
+
     @DeleteMapping("/patients/evict")
     public ResponseEntity<String> evictAllPatientsCache() {
         log.info("Evicting all patient caches.");
