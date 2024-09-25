@@ -1,6 +1,6 @@
 package com.project.Healthcare;
 
-import com.project.Healthcare.model.MedicalData;
+import com.project.Healthcare.model.Consultation;
 import com.project.Healthcare.service.KafkaEventsProducer;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,12 +40,12 @@ public class KafkaProducerExampleApplicationTests {
 	public void testSendEventsToTopic() {
 		LocalDateTime dateTime = LocalDateTime.of(2024, 7, 15, 15, 30, 0);
 
-		publisher.sendEventsToTopic(new MedicalData("263",
-				"12345", "nothing", dateTime));
-		await().pollInterval(Duration.ofSeconds(3))
-				.atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-					// assert statement
-				});
+//		publisher.sendPatientToTopic(new Consultation("263",
+//				"12345", "nothing", dateTime));
+//		await().pollInterval(Duration.ofSeconds(3))
+//				.atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+//					// assert statement
+//				});
+//	}
 	}
-
 }

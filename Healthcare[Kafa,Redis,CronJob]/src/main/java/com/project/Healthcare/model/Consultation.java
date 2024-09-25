@@ -48,4 +48,5 @@ public class Consultation implements Serializable {
         this.healthCheckup = healthCheckup;
         this.createdAt = createdAt;
     }
+
 }
