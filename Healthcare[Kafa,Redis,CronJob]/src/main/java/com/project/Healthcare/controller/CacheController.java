@@ -29,6 +29,13 @@ public class CacheController {
         this.cacheManager = cacheManager;
     }
 
+    /**
+     *
+     * @param page start of a page
+     * @param size max pages to be retrieved
+     * @param age filtering based on age
+     * @return Patient after Filtering&Paging
+     */
     @GetMapping("/patients")
     public ResponseEntity<Page<Patient>> getAllPatients(
             @RequestParam(defaultValue = "0") int page,
@@ -42,7 +49,9 @@ public class CacheController {
         return ResponseEntity.ok(patients);
     }
 
-    // Filtering by age
+    /**
+     * @param age HelperMethod to filter by age
+     */
     private Specification<Patient> filterByAge(Integer age) {
         return (root, query, builder) -> {
             if (age != null) {

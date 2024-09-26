@@ -29,8 +29,14 @@ public class IngestController {
         this.kafkaEventsProducer = kafkaEventsProducer;
     }
 
+
     @PostMapping("/jsonData")
     public ResponseEntity<String> ingestJsonData(@RequestBody String patientsData) {
+
+        if (!isValidJsonFormat(patientsData)) {
+            return ResponseEntity.badRequest().body("Invalid JSON format. JSON must start with '[' and end with ']', or start with '{' and end with '}'.");
+        }
+
         log.info("Ingesting JSON data.");
         CompletableFuture<String> completableFuture = jsonReaderService.readJson(patientsData);
 
@@ -42,6 +48,11 @@ public class IngestController {
             log.error("Failed to ingest JSON data", e);
             return ResponseEntity.status(500).body("Error ingesting JSON data: " + e.getMessage());
         }
+    }
+
+    private boolean isValidJsonFormat(String jsonData) {
+        return (jsonData.startsWith("[") && jsonData.endsWith("]")) ||
+                (jsonData.startsWith("{") && jsonData.endsWith("}"));
     }
 
     @GetMapping("/csv")

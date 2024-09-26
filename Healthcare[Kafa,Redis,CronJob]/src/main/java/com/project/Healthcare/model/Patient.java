@@ -41,5 +41,13 @@ public class Patient implements Serializable {
     @Fetch(FetchMode.JOIN)
     @JsonManagedReference
     private List<Consultation> consultations;
+
+    public Patient(long id, String name, int age, String address, String phNo, Object o, Object o1) {
+        this.id=id;
+        this.name=name;
+        this.age = age;
+        this.address =address;
+        this.phNo =phNo;
+    }
 }
 
