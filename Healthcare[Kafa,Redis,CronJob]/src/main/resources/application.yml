@@ -33,3 +33,8 @@ app:
     name: newPatientTopic1
 server:
   port: 9292
+
+aws:
+  accessKey: "*****"
+  secretKey: "****"
+  bucket: "***"
